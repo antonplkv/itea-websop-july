@@ -1,3 +1,4 @@
+from decimal import Decimal
 import mongoengine as me
 
 me.connect('webshop_db')
@@ -14,11 +15,24 @@ me.connect('webshop_db')
 class Category(me.Document):
     title = me.StringField(min_length=2, max_length=512, required=True)
     description = me.StringField(min_length=8, max_length=2048)
-    subcategory = me.ListField(me.ReferenceField('self'))
+    subcategories = me.ListField(me.ReferenceField('self'))
     parent = me.ReferenceField('self')
 
     def get_products(self):
         return Product.objects.filter(category=self)
+
+    @classmethod
+    def get_root_categories(cls):
+        return cls.objects(parent=None)
+
+    def add_subcategory(self, subcategory: 'Category'):
+        #self -> current category
+        #subcat -> category gonna be added as subcategroy to self
+        subcategory.parent = self
+        subcategory.save()
+
+        self.subcategories.append(subcategory)
+        self.save()
 
 
 class Parameter(me.EmbeddedDocument):
@@ -40,7 +54,12 @@ class Product(me.Document):
 
     @property
     def actual_price(self):
-        #Think about decimal
-        return self.price * (100 - self.discount) / 100
+        return (self.price * Decimal((100 - self.discount) / 100)).quantize(Decimal('.01'), 'ROUND_HALF_UP')
+
+    @classmethod
+    def get_products_with_discount(cls):
+        return cls.objects(discount__ne=0)
+
+
 
 
