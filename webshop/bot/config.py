@@ -1,0 +1,5 @@
+TOKEN = '1362291024:AAGMdtynyM5JO-o3ZR8qf5GoQ4Y-bjmDf0E'
+DEFAULT_PHOTO_URL = 'https://ericson-lab.com/wp-content/uploads/2017/08/nophoto.png'
+GLOBAL_IP = '34.107.11.192'
+WEBHOOK_PREFIX = '/tg'
+WEBHOOK_URL = f'https://{GLOBAL_IP}{WEBHOOK_PREFIX}'
